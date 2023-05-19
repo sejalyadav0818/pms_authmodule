@@ -1,14 +1,12 @@
-import { PrismaClient } from '.prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-
 @Injectable()
 export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  constructor(config: ConfigService) {
-    const url = config.get<string>('DATABASE_URL');
+  constructor() {
+    const url = 'mysql://root:root@localhost:3306/pms_db';
 
     super({
       datasources: {
@@ -25,12 +23,5 @@ export class PrismaService
 
   async onModuleDestroy() {
     await this.$disconnect();
-  }
-
-  async cleanDatabase() {
-    if (process.env.NODE_ENV === 'production') return;
-
-    // teardown logic
-    return Promise.all([this.user.deleteMany()]);
   }
 }
