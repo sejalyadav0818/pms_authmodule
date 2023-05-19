@@ -31,51 +31,52 @@ model user {
   password String ?
   googleid String ? @unique
   hashedRt String ?
+  isadmin  Boolean ? @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users user_role[]
+  // users user_role[]
 }
 
-model role {
-  id     Int              @id @default(autoincrement())
-  name   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  roles  user_role[]
-  roless role_permisson[]
-}
+// model role {
+//   id     Int              @id @default(autoincrement())
+//   name   String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   roles  user_role[]
+//   roless role_permisson[]
+// }
 
-model permisson {
-  id    Int              @id @default(autoincrement())
-  name  String
-  roles role_permisson[]
-  createdat DateTime @default(now())
-  updatedat DateTime @updatedAt
-}
+// model permisson {
+//   id    Int              @id @default(autoincrement())
+//   name  String
+//   roles role_permisson[]
+//   createdat DateTime @default(now())
+//   updatedat DateTime @updatedAt
+// }
 
-model user_role {
-  user       user     @relation(fields: [userid], references: [id])
-  userid     Int
-  role       role     @relation(fields: [roleid], references: [id])
-  roleid     Int
-  createdat DateTime @default(now())
-  updatedat DateTime @updatedAt
+// model user_role {
+//   user       user     @relation(fields: [userid], references: [id])
+//   userid     Int
+//   role       role     @relation(fields: [roleid], references: [id])
+//   roleid     Int
+//   createdat DateTime @default(now())
+//   updatedat DateTime @updatedAt
 
-  @@id([userid, roleid])
-}
+//   @@id([userid, roleid])
+// }
 
-//rol-permssiom 
+// //rol-permssiom 
 
-model role_permisson {
-  role         role      @relation(fields: [roleid], references: [id])
-  roleid       Int
-  permisson    permisson @relation(fields: [permisson_id], references: [id])
-  permisson_id Int
-  createdat DateTime @default(now())
-  updatedat DateTime @updatedAt
+// model role_permisson {
+//   role         role      @relation(fields: [roleid], references: [id])
+//   roleid       Int
+//   permisson    permisson @relation(fields: [permisson_id], references: [id])
+//   permisson_id Int
+//   createdat DateTime @default(now())
+//   updatedat DateTime @updatedAt
 
-  @@id([roleid, permisson_id])
-}
+//   @@id([roleid, permisson_id])
+// }
 
 
