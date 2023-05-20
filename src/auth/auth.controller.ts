@@ -47,4 +47,22 @@ export class AuthController {
   ): Promise<Tokens> {
     return this.authService.refreshTokens(userId, refreshToken);
   }
+
+  @Public()
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  forgotPassword(@Body('email') email: string): Promise<void> {
+    return this.authService.forgotPassword(email);
+  }
+
+  @Public()
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  resetPassword(
+    @Body('email') email: string,
+    @Body('token') token: string,
+    @Body('newPassword') newPassword: string,
+  ): Promise<void> {
+    return this.authService.resetPassword(email, token, newPassword);
+  }
 }

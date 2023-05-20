@@ -7,14 +7,75 @@ import { PrismaService } from '../prisma/prisma.service';
 
 import { AuthDto } from './dto';
 import { JwtPayload, Tokens } from './types';
+import { randomBytes } from 'crypto';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class AuthService {
+  private transporter: nodemailer.Transporter;
+
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
     private config: ConfigService,
-  ) {}
+  ) {
+    this.transporter = nodemailer.createTransport({
+      // Configure your email service provider details here
+      service: 'gmail',
+      auth: {
+        user: 'codebackup122@gmail.com',
+        pass: 'uuceenmlfvmxcnos',
+      },
+    });
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    const resetToken = await this.generateSecureToken();
+
+    await this.prisma.user.update({
+      where: { email },
+      data: { resetToken },
+    });
+
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: 'codebackup122@gmail.com',
+      to: email,
+      subject: 'Password Reset',
+      text: `Your password reset token is: ${resetToken}`,
+    };
+
+    await this.transporter.sendMail(mailOptions);
+  }
+
+  async resetPassword(
+    email: string,
+    token: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user || user.resetToken !== token) {
+      throw new Error('Invalid reset token');
+    }
+    const hashedPassword = await argon.hash(newPassword);
+
+    await this.prisma.user.update({
+      where: { email },
+      data: { password: hashedPassword, resetToken: null },
+    });
+  }
+
+  private async generateSecureToken(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      randomBytes(20, (err, buf) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(buf.toString('hex'));
+        }
+      });
+    });
+  }
 
   async signupLocal(dto: AuthDto): Promise<Tokens> {
     const hash = await argon.hash(dto.password);
@@ -54,7 +115,6 @@ export class AuthService {
 
     const passwordMatches = await argon.verify(user.password, dto.password);
     if (!passwordMatches) throw new ForbiddenException('Access Denied');
-
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
 
