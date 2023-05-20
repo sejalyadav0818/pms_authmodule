@@ -81,6 +81,13 @@ export class AuthController {
     return { msg: 'sejal' };
   }
   @Public()
+  @Get('darshboard')
+  @Render('darshboard') // Specify the EJS template file to render
+  panell() {
+    // Your logic to retrieve data and pass it to the template
+    return { msg: 'sejal' };
+  }
+  @Public()
   @Post('local/signup')
   @HttpCode(HttpStatus.CREATED)
   signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
