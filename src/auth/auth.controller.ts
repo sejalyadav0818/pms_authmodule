@@ -7,6 +7,8 @@ import {
   UseGuards,
   Render,
   Get,
+  Request,
+  Response,
 } from '@nestjs/common';
 import { Public, GetCurrentUserId, GetCurrentUser } from '../common/decorators';
 import { RtGuard } from '../common/guards';
@@ -19,7 +21,25 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
-  @Get('signin')
+  @Get('local/signup')
+  @Render('signup') // Specify the EJS template file to render
+  signup() {
+    // Your logic to retrieve data and pass it to the template
+    return { msg: 'sejal' };
+  }
+  @Public()
+  @Post('local/signup')
+  @HttpCode(HttpStatus.CREATED)
+  signupLocal(
+    @Body() dto: AuthDto,
+    @Request() req,
+    @Response() res,
+  ): Promise<Tokens> {
+    return this.authService.signupLocal(dto, req, res);
+  }
+
+  @Public()
+  @Get('/local/signin')
   @Render('signin') // Specify the EJS template file to render
   getLogin() {
     // Your logic to retrieve data and pass it to the template
@@ -27,23 +47,18 @@ export class AuthController {
   }
 
   @Public()
-  @Get('signin')
-  @Render('signin') // Specify the EJS template file to render
-  signini() {
-    // Your logic to retrieve data and pass it to the template
-    return { msg: 'sejal' };
+  @Post('/local/signin')
+  @HttpCode(HttpStatus.OK)
+  signinLocal(
+    @Body() dto: AuthDto,
+    @Request() req,
+    @Response() res,
+  ): Promise<Tokens> {
+    return this.authService.signinLocal(dto, req, res);
   }
 
   @Public()
-  @Get('signup')
-  @Render('signup') // Specify the EJS template file to render
-  signup() {
-    // Your logic to retrieve data and pass it to the template
-    return { msg: 'sejal' };
-  }
-
-  @Public()
-  @Get('change-password')
+  @Get('reset-password')
   @Render('change-password') // Specify the EJS template file to render
   password() {
     // Your logic to retrieve data and pass it to the template
@@ -51,11 +66,16 @@ export class AuthController {
   }
 
   @Public()
-  @Get('email-verification')
-  @Render('email-verification') // Specify the EJS template file to render
-  verification() {
-    // Your logic to retrieve data and pass it to the template
-    return { msg: 'sejal' };
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  resetPassword(
+    @Body('email') email: string,
+    @Body('token') token: string,
+    @Body('newPassword') newPassword: string,
+    @Request() req,
+    @Response() res,
+  ): Promise<void> {
+    return this.authService.resetPassword(email, token, newPassword, req, res);
   }
 
   @Public()
@@ -66,6 +86,13 @@ export class AuthController {
     return { msg: 'sejal' };
   }
 
+  // @Public()
+  // @Post('forgot-password')
+  // @HttpCode(HttpStatus.OK)
+  // resetPassword(@Body('email') email: string): Promise<void> {
+  //   return this.authService.resetPassword(email);
+  // }
+
   @Public()
   @Get('logout')
   @Render('logout') // Specify the EJS template file to render
@@ -73,6 +100,17 @@ export class AuthController {
     // Your logic to retrieve data and pass it to the template
     return { msg: 'sejal' };
   }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(
+    @GetCurrentUserId() userId: number,
+    @Request() req,
+    @Response() res,
+  ): Promise<boolean> {
+    return this.authService.logout(userId, req, res);
+  }
+
   @Public()
   @Get('user-panel')
   @Render('user-panel') // Specify the EJS template file to render
@@ -87,25 +125,6 @@ export class AuthController {
     // Your logic to retrieve data and pass it to the template
     return { msg: 'sejal' };
   }
-  @Public()
-  @Post('local/signup')
-  @HttpCode(HttpStatus.CREATED)
-  signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
-    return this.authService.signupLocal(dto);
-  }
-
-  @Public()
-  @Post('/signin')
-  @HttpCode(HttpStatus.OK)
-  signinLocal(@Body() dto: AuthDto): Promise<Tokens> {
-    return this.authService.signinLocal(dto);
-  }
-
-  @Post('logout')
-  @HttpCode(HttpStatus.OK)
-  logout(@GetCurrentUserId() userId: number): Promise<boolean> {
-    return this.authService.logout(userId);
-  }
 
   @Public()
   @UseGuards(RtGuard)
@@ -119,20 +138,10 @@ export class AuthController {
   }
 
   @Public()
-  @Post('forgot-password')
-  @HttpCode(HttpStatus.OK)
-  forgotPassword(@Body('email') email: string): Promise<void> {
-    return this.authService.forgotPassword(email);
-  }
-
-  @Public()
-  @Post('reset-password')
-  @HttpCode(HttpStatus.OK)
-  resetPassword(
-    @Body('email') email: string,
-    @Body('token') token: string,
-    @Body('newPassword') newPassword: string,
-  ): Promise<void> {
-    return this.authService.resetPassword(email, token, newPassword);
+  @Get('email-verification')
+  @Render('email-verification') // Specify the EJS template file to render
+  verification() {
+    // Your logic to retrieve data and pass it to the template
+    return { msg: 'sejal' };
   }
 }

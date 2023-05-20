@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { Request, Response } from 'express';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as argon from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
@@ -50,6 +51,8 @@ export class AuthService {
     email: string,
     token: string,
     newPassword: string,
+    req: Request,
+    res: Response,
   ): Promise<void> {
     const user = await this.prisma.user.findUnique({ where: { email } });
 
@@ -76,7 +79,11 @@ export class AuthService {
     });
   }
 
-  async signupLocal(dto: AuthDto): Promise<Tokens> {
+  async signupLocal(
+    dto: AuthDto,
+    req: Request,
+    res: Response,
+  ): Promise<Tokens> {
     const hash = await argon.hash(dto.password);
 
     const user = await this.prisma.user
@@ -85,7 +92,6 @@ export class AuthService {
           name: dto.name,
           email: dto.email,
           password: hash,
-          googleid: dto.googleid,
         },
       })
       .catch((error) => {
@@ -99,11 +105,15 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
-
+    res.redirect('/auth/local/signup');
     return tokens;
   }
 
-  async signinLocal(dto: AuthDto): Promise<Tokens> {
+  async signinLocal(
+    dto: AuthDto,
+    req: Request,
+    res: Response,
+  ): Promise<Tokens> {
     const user = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
@@ -116,11 +126,11 @@ export class AuthService {
     if (!passwordMatches) throw new ForbiddenException('Access Denied');
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
-
+    res.render('user-panel');
     return tokens;
   }
 
-  async logout(userId: number): Promise<boolean> {
+  async logout(userId: number, req: Request, res: Response): Promise<boolean> {
     await this.prisma.user.updateMany({
       where: {
         id: userId,
