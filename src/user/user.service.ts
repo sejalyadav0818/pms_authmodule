@@ -15,6 +15,8 @@ export class UserService {
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
+
+  //insert
   async create(
     dto: CreateUserDto,
     req: Request,
@@ -41,7 +43,6 @@ export class UserService {
 
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
-    res.redirect('/user/insert');
     return tokens;
   }
 
@@ -96,14 +97,14 @@ export class UserService {
       refresh_token: rt,
     };
   }
-
+  //all user
   async getAllUser(req: Request, res: Response) {
     try {
       const users = await this.prisma.user.findMany({
         select: { id: true, email: true, name: true },
         where: { isadmin: false },
       });
-      console.log(users);
+      // console.log(users);
 
       res.render('user-panel', { users });
       return { users };
@@ -111,15 +112,13 @@ export class UserService {
       throw err;
     }
   }
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  //delete user
+  async deleteUserById(id: number, req: Request, res: Response) {
+    await this.prisma.user.delete({
+      where: {
+        id: id, // Pass the id as a number directly
+      },
+    });
   }
-
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  //update user
 }

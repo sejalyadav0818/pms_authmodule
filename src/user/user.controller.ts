@@ -9,6 +9,8 @@ import {
   Render,
   Request,
   Response,
+  HttpStatus,
+  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -26,8 +28,8 @@ export class UserController {
   // }
 
   @Public()
-  @Get('/user-penal')
-  @Render('user-penal') // Specify the EJS template file to render
+  @Get('/user-panel')
+  @Render('user-panel') // Specify the EJS template file to render
   userPenal() {
     // Your logic to retrieve data and pass it to the template
     return { msg: 'sejal' };
@@ -49,20 +51,12 @@ export class UserController {
   }
 
   @Public()
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  // @Public()
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.userService.update(+id, updateUserDto);
-  // }
-
-  @Public()
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @Post('/delete/:id')
+  async deleteUserById(
+    @Param('id') id: number,
+    @Request() req,
+    @Response() res,
+  ) {
+    return this.userService.deleteUserById(Number(id), res, req); // Convert the id to a number if necessary
   }
 }
