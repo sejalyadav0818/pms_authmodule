@@ -97,17 +97,13 @@ export class UserService {
       refresh_token: rt,
     };
   }
-  //all user
-  async getAllUser(req: Request, res: Response) {
+  async getAllUser() {
     try {
       const users = await this.prisma.user.findMany({
         select: { id: true, email: true, name: true },
         where: { isadmin: false },
       });
-      // console.log(users);
-
-      res.render('user-panel', { users });
-      return { users };
+      return users;
     } catch (err) {
       throw err;
     }

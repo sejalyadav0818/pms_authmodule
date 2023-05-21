@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Req, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
@@ -109,11 +109,27 @@ export class AuthService {
     return tokens;
   }
 
-  async signinLocal(
-    dto: AuthDto,
-    req: Request,
-    res: Response,
-  ): Promise<Tokens> {
+  // async signinLocal(
+  //   dto: AuthDto,
+  //   req: Request,
+  //   res: Response,
+  // ): Promise<Tokens> {
+  //   const user = await this.prisma.user.findUnique({
+  //     where: {
+  //       email: dto.email,
+  //     },
+  //   });
+
+  //   if (!user) throw new ForbiddenException('Access Denied');
+
+  //   const passwordMatches = await argon.verify(user.password, dto.password);
+  //   if (!passwordMatches) throw new ForbiddenException('Access Denied');
+  //   const tokens = await this.getTokens(user.id, user.email);
+  //   await this.updateRtHash(user.id, tokens.refresh_token);
+  //   res.render('user-panel');
+  //   return tokens;
+  // }
+  async signinLocal(dto: AuthDto, @Res() res: Response): Promise<Tokens> {
     const user = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
@@ -124,12 +140,19 @@ export class AuthService {
 
     const passwordMatches = await argon.verify(user.password, dto.password);
     if (!passwordMatches) throw new ForbiddenException('Access Denied');
+
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
-    res.render('user-panel');
+
+    const users = await this.prisma.user.findMany({
+      select: { id: true, email: true, name: true },
+      where: { isadmin: false },
+    });
+
+    res.render('user-panel', { user, users });
+
     return tokens;
   }
-
   async logout(userId: number, req: Request, res: Response): Promise<boolean> {
     await this.prisma.user.updateMany({
       where: {
