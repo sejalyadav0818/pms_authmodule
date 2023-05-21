@@ -27,13 +27,27 @@ export class UserController {
   //   return this.userService.create(createUserDto);
   // }
 
+  // @Public()
+  // @Get('/user-panel')
+  // @Render('user-panel') // Specify the EJS template file to render
+  // userPenal() {
+  //   // Your logic to retrieve data and pass it to the template
+  //   return { msg: 'sejal' };
+  // }
+
   @Public()
   @Get('/user-panel')
   @Render('user-panel') // Specify the EJS template file to render
-  userPenal() {
-    // Your logic to retrieve data and pass it to the template
-    return { msg: 'sejal' };
+  async userPanel(@Request() req, @Response() res) {
+    try {
+      const users = await this.userService.getAllUser(req, res);
+      return { users };
+    } catch (error) {
+      // Handle the error appropriately
+      throw error;
+    }
   }
+
   @Public()
   @Post('/insert')
   insertuser(
@@ -58,5 +72,15 @@ export class UserController {
     @Response() res,
   ) {
     return this.userService.deleteUserById(Number(id), res, req); // Convert the id to a number if necessary
+  }
+  @Public()
+  @Post('/edit/:id')
+  async editUser(
+    @Param('id') id: number,
+    @Body() dto: CreateUserDto,
+    @Request() req,
+    @Response() res,
+  ) {
+    return this.userService.editUserById(Number(id), dto, res, req);
   }
 }

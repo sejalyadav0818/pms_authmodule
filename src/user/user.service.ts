@@ -120,4 +120,22 @@ export class UserService {
       },
     });
   }
+  //update user
+  async editUserById(
+    id: number,
+    dto: CreateUserDto,
+    req: Request,
+    res: Response,
+  ) {
+    await this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name: dto.name,
+        email: dto.email,
+        password: dto.password,
+      },
+    });
+  }
 }
