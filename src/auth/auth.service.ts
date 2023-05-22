@@ -9,6 +9,7 @@ import { AuthDto } from './dto';
 import { JwtPayload, Tokens } from './types';
 import { randomBytes } from 'crypto';
 import * as nodemailer from 'nodemailer';
+import { rmSync } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +30,11 @@ export class AuthService {
     });
   }
 
-  async forgotPassword(email: string): Promise<void> {
+  async forgotPassword(
+    email: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
     const resetToken = await this.generateSecureToken();
 
     await this.prisma.user.update({
@@ -45,6 +50,8 @@ export class AuthService {
     };
 
     await this.transporter.sendMail(mailOptions);
+    // const redirectUrl = '/auth/change-password'; // Specify the URL of the page you want to redirect to
+    // res.redirect(redirectUrl);
   }
 
   async resetPassword(
@@ -129,7 +136,11 @@ export class AuthService {
   //   res.render('user-panel');
   //   return tokens;
   // }
-  async signinLocal(dto: AuthDto, @Res() res: Response): Promise<Tokens> {
+  async signinLocal(
+    dto: AuthDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<Tokens> {
     const user = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
