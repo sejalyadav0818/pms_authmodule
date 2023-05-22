@@ -26,13 +26,11 @@ export class UserController {
   // create(@Body() createUserDto: CreateUserDto) {
   //   return this.userService.create(createUserDto);
   // }
-
-  // @Public()z
-  // @Get('/user-panel')
-  // @Render('user-panel') // Specify the EJS template file to render
-  // userPenal() {
-  //   // Your logic to retrieve data and pass it to the template
-  //   return { msg: 'sejal' };
+  // @Public()
+  // @Get('/user/user-listing')
+  // @Render('/user/user-listing')
+  // async userPanell(@Request() req, @Response() res) {
+  //   return { msg: 'sehal' };
   // }
   @Public()
   @Get('/user-panel')

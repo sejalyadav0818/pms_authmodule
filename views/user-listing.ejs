@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Listing</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    h1 { color: #000000; font-size: 48px; font-family: 'Signika', sans-serif; padding-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <br>
+    <h1>User Listing</h1>
+   
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Listing</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    h1 { color: #000000; font-size: 48px; font-family: 'Signika', sans-serif; padding-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <br>
+    <h1>User Listing</h1>
+    <br>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Permissions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(function(user) { %>
+          <tr>
+            <td><%= user.id %></td>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td><%= user.role.name %></td>
+            <td>
+              <% user.permissions.forEach(function(permission) { %>
+                <%= permission.name %><br>
+              <% }) %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
